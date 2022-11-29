@@ -4,7 +4,8 @@ defaults:
 
 # task settings
 # task: MiniGrid-DoorKey-6x6-v0
-task: MiniGrid-Empty-5x5-v0
+# task: MiniGrid-Empty-5x5-v0
+task: "atari-ALE/Pong-v5"
 domain: cheetah
 obs_type: pixels # [states | pixels]
 frame_stack: 3 # only works if obs_type=pixels

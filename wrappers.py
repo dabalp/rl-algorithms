@@ -215,13 +215,29 @@ def make_env(name):
 
         # env = Minigrid(name)
         env = gym.make(name, render_mode="rgb_array")
-        # env = RGBImgPartialObsWrapper(env)
-        env = RGBImgObsWrapper(env)
+        # env = RGBImgPartialObsWrapper(env) # returns (56,56,3) image
+        env = RGBImgObsWrapper(env)  # returns (40,40,3) image
         print(env.render_mode)
         env = Minigrid(env)
         env = ExtendedTimeStepWrapper(env)
         env = FrameStackWrapper(env, 3)
         print("env created")
+    elif suite == "atari":
+        # import gymnasium
+        import gymnasium as gym
+        # import gym
+        from gymnasium.wrappers import AtariPreprocessing, FrameStack
+
+        print(task)
+        # make_kwargs = {"frameskip": 1}
+        # env = gym.make("GymV26Environment-v0", env_id=task, make_kwargs=make_kwargs)
+        # env = gym.make("PongNoFrameskip-v4")
+        env = gym.make("ALE/Pong-v5", frameskip=1)
+        env = AtariPreprocessing(env)
+        # env = gym.make("PongNoFrameskip-v4")
+        # noopreset, max_and_skip, fire_reset, episodic_life, clip_reward,
+        # resize_obs, greyscale, frame_stack
+
     else:
         env = None
 

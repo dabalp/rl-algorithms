@@ -66,9 +66,11 @@ class Workspace:
         #     self.train_env.action_spec(),
         #     cfg.agent,
         # )
-        print(self.train_env.observation_spec().name)
-        print(self.train_env.observation_spec())
-        print(self.train_env.action_spec())
+        print(self.train_env.observation_space)
+        print(self.train_env.action_space)
+        # print(self.train_env.observation_spec().name)
+        # print(self.train_env.observation_spec())
+        # print(self.train_env.action_spec())
         self.agent = hydra.utils.instantiate(
             cfg.agent,
             obs_type=cfg.obs_type,
