@@ -89,6 +89,8 @@ class FrameStackWrapper(dm_env.Environment):
         # remove batch dim
         if len(pixels_shape) == 4:
             pixels_shape = pixels_shape[1:]
+        # if len(pixels_shape) == 2:  # for atari grayscale add extra dim for channels
+        #     pixels_shape = (pixels_shape[0], pixels_shape[1], 1)
         self._obs_spec = specs.BoundedArray(
             shape=np.concatenate(
                 [[pixels_shape[2] * num_frames], pixels_shape[:2]], axis=0
@@ -133,6 +135,69 @@ class FrameStackWrapper(dm_env.Environment):
 
     def __getattr__(self, name):
         return getattr(self._env, name)
+
+
+# DM Env Wrapper for atari
+class Atari(dm_env.Environment):
+    def __init__(self, env):
+        self.env = env
+        wrapped_obs_spec = self.env.observation_space
+        self._action_spec = dm_env.specs.BoundedArray(
+            shape=(env.action_space.n,),
+            # shape=(1,),
+            dtype=np.int64,
+            minimum=0,
+            maximum=env.action_space.n - 1,
+            name="action",
+        )
+        self._observation_spec = dm_env.specs.BoundedArray(
+            shape=wrapped_obs_spec.shape,
+            dtype=wrapped_obs_spec.dtype,
+            minimum=0,
+            maximum=255,
+            name="observation",
+        )
+        self._reward_spec = dm_env.specs.Array(
+            shape=(), dtype=np.float32, name="reward"
+        )
+
+    def reset(self):
+        timestep = self.env.reset()
+        # filter out image from tuple timestep = (array([...]), {...})
+        obs = timestep[0]
+        # obs = OrderedDict()
+        # obs["observation"] = obs_img
+
+        return dm_env.TimeStep(
+            dm_env.StepType.FIRST, reward=None, discount=1.0, observation=obs
+        )
+
+    def step(self, action):
+        obs, reward, done, truncated, info = self.env.step(action)
+        # obs = self._transform_image(obs)
+        if done:
+            return dm_env.TimeStep(
+                dm_env.StepType.LAST, reward, discount=0.0, observation=obs
+            )
+        else:
+            return dm_env.TimeStep(
+                dm_env.StepType.MID, reward, discount=1.0, observation=obs
+            )
+
+    def observation_spec(self):
+        return self._observation_spec
+
+    def action_spec(self):
+        return self._action_spec
+
+    def close(self):
+        self.env.close()
+
+    def render(self, mode="human"):
+        return self.env.render()
+
+    def seed(self, seed=None):
+        return self.env.seed(seed)
 
 
 # DM Env Wrapper for minigrid
@@ -232,8 +297,9 @@ def make_env(name):
         # make_kwargs = {"frameskip": 1}
         # env = gym.make("GymV26Environment-v0", env_id=task, make_kwargs=make_kwargs)
         # env = gym.make("PongNoFrameskip-v4")
-        env = gym.make("ALE/Pong-v5", frameskip=1)
-        env = AtariPreprocessing(env)
+        env = gym.make("ALE/Pong-v5", frameskip=1, render_mode="rgb_array")
+        env = AtariPreprocessing(env, grayscale_newaxis=True)
+        env = Atari(env)
         # env = gym.make("PongNoFrameskip-v4")
         # noopreset, max_and_skip, fire_reset, episodic_life, clip_reward,
         # resize_obs, greyscale, frame_stack
@@ -241,4 +307,6 @@ def make_env(name):
     else:
         env = None
 
+    env = ExtendedTimeStepWrapper(env)
+    env = FrameStackWrapper(env, 3)
     return env

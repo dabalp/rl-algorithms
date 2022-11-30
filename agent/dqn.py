@@ -12,13 +12,14 @@ class Encoder(nn.Module):
         super().__init__()
 
         assert len(obs_shape) == 3
-        # self.repr_dim = 32 * 35 * 35
-        # self.repr_dim = 32 * 25 * 25
-        self.repr_dim = 32 * 17 * 17
+        # self.repr_dim = 32 * 35 * 35 # dm_control
+        # self.repr_dim = 32 * 25 * 25 # minigrid partial obs
+        # self.repr_dim = 32 * 17 * 17 #minigrid full
+        self.repr_dim = 32 * 38 * 38  # atari
 
         self.convnet = nn.Sequential(
-            # nn.Conv2d(obs_shape[0], 32, 3, stride=2),
-            nn.Conv2d(9, 32, 2, stride=2),
+            nn.Conv2d(obs_shape[0], 32, 3, stride=2),
+            # nn.Conv2d(9, 32, 2, stride=2),
             nn.ReLU(),
             nn.Conv2d(32, 32, 2, stride=1),
             nn.ReLU(),
