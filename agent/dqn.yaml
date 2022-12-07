@@ -4,13 +4,13 @@ name: dqn
 obs_type: ??? # to be specified later
 obs_shape: ??? # to be specified later
 action_shape: ??? # to be specified later
-hidden_dim: 128
+hidden_dim: 512
 device: ${device}
 lr: 1e-4
-gamma: 0.9
-batch_size: 512
+gamma: 0.99
+batch_size: 32
 tau: 0.01
 update_every_steps: 2
 use_wandb: ${use_wandb}
 nstep: 1
-epsilon: 0.9
+epsilon: 0.1

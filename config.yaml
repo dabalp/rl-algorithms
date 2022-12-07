@@ -3,9 +3,10 @@ defaults:
   - override hydra/launcher: submitit_local
 
 # task settings
-# task: MiniGrid-DoorKey-6x6-v0
-# task: MiniGrid-Empty-5x5-v0
-task: "atari-ALE/Pong-v5"
+# task: MiniGrid-TMaze-5x5-v0
+task: MiniGrid-Empty-5x5-v0
+# task: MiniGrid-LavaGapS5-v0
+# task: "atari-ALE/Pong-v5"
 domain: cheetah
 obs_type: pixels # [states | pixels]
 frame_stack: 3 # only works if obs_type=pixels

@@ -11,7 +11,6 @@ os.environ["MUJOCO_GL"] = "egl"
 from collections import OrderedDict
 from pathlib import Path
 
-# import dmc
 import hydra
 import numpy as np
 import torch
@@ -27,13 +26,6 @@ torch.backends.cudnn.benchmark = True
 from wrappers import make_env
 
 
-def make_agent(obs_type, obs_spec, action_spec, cfg):
-    cfg.obs_type = obs_type
-    cfg.obs_shape = obs_spec.shape
-    cfg.action_shape = action_spec.shape
-    return hydra.utils.instantiate(cfg)
-
-
 class Workspace:
     def __init__(self, cfg):
         self.cfg = cfg
@@ -44,7 +36,7 @@ class Workspace:
         # Weigths and biases (wandb) logger
         if cfg.use_wandb:
             exp_name = " ".join(
-                [cfg.experiment, cfg.agent.name, cfg.env, cfg.obs_type, str(cfg.seed)]
+                [cfg.experiment, cfg.agent.name, cfg.task, cfg.obs_type, str(cfg.seed)]
             )
             wandb.init(project="rl-algo", group=cfg.agent.name, name=exp_name)
 
@@ -52,20 +44,8 @@ class Workspace:
 
         self.train_env = make_env(cfg.task)
         self.eval_env = make_env(cfg.task)
-        # self.train_env = dmc.make(
-        #     cfg.task, cfg.obs_type, cfg.frame_stack, cfg.action_repeat, cfg.seed
-        # )
-        # self.eval_env = dmc.make(
-        #     cfg.task, cfg.obs_type, cfg.frame_stack, cfg.action_repeat, cfg.seed
-        # )
 
         # create agent
-        # self.agent = make_agent(
-        #     cfg.obs_type,
-        #     self.train_env.observation_spec(),
-        #     self.train_env.action_spec(),
-        #     cfg.agent,
-        # )
         # print(self.train_env.observation_space)
         # print(self.train_env.action_space)
         print(self.train_env.observation_spec().name)
@@ -236,11 +216,9 @@ class Workspace:
                 self.logger.log_metrics(metrics, self.global_frame, ty="train")
 
             # take env step
-            # print("action", action)
             time_step = self.train_env.step(action)
-            # print("time_step", time_step.action)
-            # print("time_step", time_step)
-            # print(len(self.replay_storage))
+            # print(time_step.step_type, time_step.last())
+            # print(episode_step)
             # self.train_env.render()
             episode_reward += time_step.reward
             self.replay_storage.add(time_step, meta)

@@ -243,7 +243,7 @@ class Minigrid(dm_env.Environment):
         obs, reward, done, truncated, info = self.env.step(action)
         obs = obs["image"]  # take only img and drop info like direction and mission
         # obs = self._transform_image(obs)
-        if done:
+        if done or truncated:  # truncated is when max_steps is reached
             return dm_env.TimeStep(
                 dm_env.StepType.LAST, reward, discount=0.0, observation=obs
             )
@@ -279,13 +279,14 @@ def make_env(name):
                                        RGBImgPartialObsWrapper, gym)
 
         # env = Minigrid(name)
+        # env = gym.make(name, render_mode="rgb_array", max_steps=10)
         env = gym.make(name, render_mode="rgb_array")
-        # env = RGBImgPartialObsWrapper(env) # returns (56,56,3) image
+        # env = RGBImgPartialObsWrapper(env)  # returns (56,56,3) image
         env = RGBImgObsWrapper(env)  # returns (40,40,3) image
         print(env.render_mode)
         env = Minigrid(env)
-        env = ExtendedTimeStepWrapper(env)
-        env = FrameStackWrapper(env, 3)
+        # env = ExtendedTimeStepWrapper(env)
+        # env = FrameStackWrapper(env, 3)
         print("env created")
     elif suite == "atari":
         # import gymnasium
@@ -307,6 +308,7 @@ def make_env(name):
     else:
         env = None
 
-    env = ExtendedTimeStepWrapper(env)
+    # env = ExtendedTimeStepWrapper(env)
     env = FrameStackWrapper(env, 3)
+    env = ExtendedTimeStepWrapper(env)
     return env
