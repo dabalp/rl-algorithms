@@ -2,6 +2,11 @@
 
 This repository contains the implementation of various reinforcement learning algorithms in PyTorch. These algorithms can be used to train agents to solve a wide range of tasks, from playing games to real-world applications such as robotics.
 
+<p align="center">
+<img width="12%" src="https://imgur.com/7qBGyHj.gif">
+<img width="30%" src="https://imgur.com/I1gXR3U.png">
+</p>
+
 This repository depends on the following frameworks:
 
 - **[WeightAndBiases](https://www.wandb.com/)**: a tool for tracking and visualizing machine learning experiments.
@@ -13,5 +18,6 @@ This repository depends on the following frameworks:
 The following algorithms are included in this repository:
 
 - **Deep Q-learning**: a variant of Q-learning that uses a deep neural network to represent the action-value function, allowing for better generalization and the ability to handle high-dimensional state spaces. Q-learning is a model-free algorithm for learning a policy that maps states to actions, using the Bellman equation to update the action-value function.
+
 
 
